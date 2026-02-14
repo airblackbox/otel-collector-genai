@@ -1,10 +1,12 @@
 # otelcol-genai-safe
 
-**Privacy-by-default OpenTelemetry Collector processor for GenAI workloads.**
+**The privacy and safety layer for GenAI observability infrastructure.**
 
-Your AI agents talk to LLMs. Those LLM calls produce traces full of prompts, completions, API keys, and cost data. This processor sits inside your OTel Collector and makes those traces safe before they hit your observability backend.
+Every company running LLM agents in production has the same problem: traces full of prompts, completions, API keys, and cost data flowing into observability backends with zero protection. There is no standard for how to handle this at the infrastructure level.
 
-No SDK changes. No app code modifications. Just add it to your collector pipeline.
+This project defines that standard — a collector-side processor that enforces privacy, extracts cost metrics, and detects runaway agents before traces reach storage. No SDK changes. No app code. Deploy once, protect every team.
+
+Part of the [GenAI Observability Infrastructure](https://github.com/nostalgicskinco/genai-semantic-normalizer) project.
 
 ---
 
@@ -167,7 +169,7 @@ This processor does NOT protect against:
 
 ## Contributing
 
-PRs welcome. The codebase is intentionally small — one processor, ~500 lines of Go.
+PRs welcome. The codebase is intentionally small — one processor, ~500 lines of Go. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines and CLA.
 
 ```bash
 # Run tests
@@ -181,4 +183,8 @@ go build ./cmd/otelcol-custom
 
 ## License
 
-Apache 2.0
+**v0.1.0 and earlier:** Apache 2.0 ([release](https://github.com/nostalgicskinco/opentelemetry-collector-processor-genai/releases/tag/v0.1.0))
+
+**v0.2.0+:** [GNU Affero General Public License v3.0](LICENSE) with a [commercial license](COMMERCIAL_LICENSE.md) available for hosted services and commercial products.
+
+**Free for internal use.** Companies running this processor in their own OTel Collector deployments do not need a commercial license. See [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) for details.

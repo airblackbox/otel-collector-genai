@@ -1,17 +1,39 @@
-                                 Apache License
-                           Version 2.0, January 2004
-                        http://www.apache.org/licenses/
+                    GNU AFFERO GENERAL PUBLIC LICENSE
+                       Version 3, 19 November 2007
 
-   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+Copyright (C) 2024 Nostalgic Skin Co.
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+Everyone is permitted to copy and distribute verbatim copies of this
+license document, but changing it is not allowed.
 
-       http://www.apache.org/licenses/LICENSE-2.0
+                            Preamble
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+The GNU Affero General Public License is a free, copyleft license for
+software and other kinds of works, specifically designed to ensure
+cooperation with the community in the case of network server software.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public
+License along with this program. If not, see
+<https://www.gnu.org/licenses/agpl-3.0.html>.
+
+ADDITIONAL TERMS:
+
+As a special exception, the copyright holders grant you permission to
+use this software as a processor/plugin within the OpenTelemetry
+Collector for internal, non-commercial use without triggering the
+network-interaction clause of the AGPL. Commercial use, redistribution
+as part of a hosted service, or inclusion in a commercial product
+requires a commercial license. See COMMERCIAL_LICENSE.md for details.
+
+For the full text of the GNU Affero General Public License v3.0, see:
+https://www.gnu.org/licenses/agpl-3.0.html
