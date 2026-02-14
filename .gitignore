@@ -8,7 +8,6 @@ otelcol-genai-safe
 
 # Go
 vendor/
-go.sum
 
 # IDE
 .idea/
