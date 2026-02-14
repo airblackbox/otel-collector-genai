@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.54
+    ports:
+      - "16686:16686"   # Jaeger UI
+      - "14268:14268"   # Jaeger collector HTTP
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+
+  otelcol:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    command: ["--config=/etc/otelcol-config.yaml"]
+    volumes:
+      - ./otelcol-config.yaml:/etc/otelcol-config.yaml:ro
+    ports:
+      - "4317:4317"     # OTLP gRPC
+      - "4318:4318"     # OTLP HTTP
+    depends_on:
+      - jaeger
