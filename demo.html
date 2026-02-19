@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>otelcol-genai-safe — Interactive Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --border: #1e1e2e;
+    --text: #e2e2e8;
+    --text-dim: #6e6e82;
+    --accent: #F5A623;
+    --accent-glow: rgba(245,166,35,0.08);
+    --green: #34d399;
+    --red: #f87171;
+    --orange: #fb923c;
+    --blue: #60a5fa;
+    --purple: #a78bfa;
+    --teal: #00ADD8;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', sans-serif;
+    overflow: hidden; height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ── Progress bar ── */
+  #progress-bar {
+    position: fixed; top: 0; left: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--orange));
+    transition: width 0.4s ease; z-index: 200;
+  }
+
+  /* ── Scene framework ── */
+  #scene-container { position: relative; width: 100%; height: 100vh; }
+  .scene {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px 30px 100px;
+    opacity: 0; transform: translateY(30px);
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    text-align: center;
+  }
+  .scene.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .scene.exit { opacity: 0; transform: translateY(-30px); }
+
+  h1 { font-size: clamp(2rem,5vw,3.5rem); font-weight: 900; line-height: 1.1; }
+  h2 { font-size: clamp(1.4rem,3.5vw,2.2rem); font-weight: 800; line-height: 1.2; }
+  h3 { font-size: clamp(0.9rem,2vw,1.15rem); font-weight: 400; color: var(--text-dim); line-height: 1.6; max-width: 700px; }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--accent), var(--orange));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Pills ── */
+  .pill {
+    display: inline-block; padding: 6px 16px;
+    border-radius: 20px; font-size: 0.75rem;
+    font-weight: 600; letter-spacing: 0.05em;
+    border: 1px solid var(--border);
+  }
+  .pill-accent { background: var(--accent-glow); color: var(--accent); border-color: rgba(245,166,35,0.2); }
+  .pill-green { background: rgba(52,211,153,0.08); color: var(--green); border-color: rgba(52,211,153,0.2); }
+  .pill-red { background: rgba(248,113,113,0.08); color: var(--red); border-color: rgba(248,113,113,0.2); }
+  .pill-orange { background: rgba(251,146,60,0.08); color: var(--orange); border-color: rgba(251,146,60,0.2); }
+  .pill-blue { background: rgba(96,165,250,0.08); color: var(--blue); border-color: rgba(96,165,250,0.2); }
+  .pill-purple { background: rgba(167,139,250,0.08); color: var(--purple); border-color: rgba(167,139,250,0.2); }
+  .pill-teal { background: rgba(0,173,216,0.08); color: var(--teal); border-color: rgba(0,173,216,0.2); }
+
+  /* ── Code blocks ── */
+  .code-block {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 24px;
+    text-align: left; width: 100%; max-width: 700px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+    line-height: 1.7; overflow-x: auto;
+  }
+  .code-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 16px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #ffbd2e; }
+  .dot-green { background: #28ca42; }
+  .code-title { font-size: 0.7rem; color: var(--text-dim); margin-left: 8px; }
+  .line { opacity: 0; transform: translateX(-10px); transition: all 0.3s ease; }
+  .line.visible { opacity: 1; transform: translateX(0); }
+  .kw { color: var(--purple); }
+  .str { color: var(--green); }
+  .fn { color: var(--blue); }
+  .cm { color: var(--text-dim); font-style: italic; }
+  .cls { color: var(--accent); }
+  .num { color: var(--orange); }
+  .line.highlight { background: var(--accent-glow); margin: 0 -24px; padding: 0 24px; border-left: 2px solid var(--accent); }
+  .line.redacted { background: rgba(248,113,113,0.06); margin: 0 -24px; padding: 0 24px; border-left: 2px solid var(--red); }
+  .line.safe { background: rgba(52,211,153,0.06); margin: 0 -24px; padding: 0 24px; border-left: 2px solid var(--green); }
+
+  /* ── Terminal ── */
+  .terminal {
+    background: #0c0c14; border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 24px;
+    text-align: left; width: 100%; max-width: 720px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+    line-height: 1.8;
+  }
+  .term-line { opacity: 0; transform: translateX(-10px); transition: all 0.3s ease; }
+  .term-line.visible { opacity: 1; transform: translateX(0); }
+  .prompt { color: var(--accent); }
+  .output { color: var(--text); }
+  .info { color: var(--blue); }
+  .success { color: var(--green); }
+  .warn { color: var(--orange); }
+  .error { color: var(--red); }
+  .dim { color: var(--text-dim); }
+
+  /* ── Stats grid ── */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 16px; max-width: 750px; width: 100%;
+  }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 16px;
+    opacity: 0; transform: translateY(20px);
+    transition: all 0.4s ease;
+  }
+  .stat-card.visible { opacity: 1; transform: translateY(0); }
+  .stat-number { font-size: 2rem; font-weight: 900; }
+  .stat-label { font-size: 0.7rem; color: var(--text-dim); margin-top: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* ── Flow / Architecture ── */
+  .flow-container {
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; flex-wrap: wrap; max-width: 800px;
+  }
+  .flow-node {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    opacity: 0; transform: scale(0.8); transition: all 0.4s ease;
+  }
+  .flow-node.visible { opacity: 1; transform: scale(1); }
+  .flow-icon {
+    width: 56px; height: 56px; border-radius: 14px;
+    border: 1px solid var(--border); display: flex;
+    align-items: center; justify-content: center; font-size: 1.4rem;
+    background: var(--surface);
+  }
+  .flow-label { font-size: 0.7rem; color: var(--text-dim); font-weight: 600; line-height: 1.3; }
+  .flow-arrow { color: var(--accent); font-size: 1.2rem; opacity: 0; transition: all 0.3s ease; }
+  .flow-arrow.visible { opacity: 1; }
+
+  /* ── Compare table ── */
+  .compare-table {
+    width: 100%; max-width: 750px;
+    border-collapse: collapse; font-size: 0.8rem;
+  }
+  .compare-table th, .compare-table td {
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  .compare-table th {
+    color: var(--text-dim); font-weight: 600; font-size: 0.75rem;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .compare-table tbody tr {
+    opacity: 0; transform: translateX(-10px); transition: all 0.3s ease;
+  }
+  .compare-table tbody tr.visible { opacity: 1; transform: translateX(0); }
+
+  /* ── Before/After diff ── */
+  .diff-container {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; max-width: 800px; width: 100%;
+  }
+  .diff-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px;
+    text-align: left; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; line-height: 1.8;
+  }
+  .diff-title {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; margin-bottom: 12px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── Spacers ── */
+  .gap-sm { height: 16px; }
+  .gap-md { height: 28px; }
+  .gap-lg { height: 40px; }
+
+  /* ── Particles ── */
+  .particle {
+    position: fixed; width: 4px; height: 4px;
+    background: var(--accent); border-radius: 50%;
+    opacity: 0.15; pointer-events: none;
+    animation: float-particle 8s infinite ease-in-out;
+  }
+  @keyframes float-particle {
+    0%, 100% { transform: translateY(0) translateX(0); }
+    25% { transform: translateY(-30px) translateX(15px); }
+    50% { transform: translateY(-10px) translateX(-20px); }
+    75% { transform: translateY(-40px) translateX(10px); }
+  }
+
+  /* ── Navigation ── */
+  #nav {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 16px; z-index: 100;
+  }
+  .nav-btn {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); padding: 10px 24px; border-radius: 10px;
+    font-family: 'Inter', sans-serif; font-size: 0.85rem;
+    font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+  }
+  .nav-btn:hover { border-color: var(--accent); background: var(--accent-glow); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .nav-btn:disabled:hover { border-color: var(--border); background: var(--surface); }
+  #scene-counter { font-size: 0.8rem; color: var(--text-dim); font-weight: 600; min-width: 50px; text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- Floating particles -->
+<div id="particles"></div>
+
+<!-- Progress bar -->
+<div id="progress-bar" style="width:0%"></div>
+
+<!-- ═══════════════ SCENE 0 — TITLE ═══════════════ -->
+<div id="scene-container">
+<div class="scene active" id="scene-0">
+  <div class="pill pill-accent" style="margin-bottom: 20px;">AIR BLACKBOX</div>
+  <h1><span class="gradient-text">otelcol-genai-safe</span></h1>
+  <div class="gap-sm"></div>
+  <h3>OpenTelemetry Collector Processor for GenAI — privacy-by-default redaction, cost metrics, and loop detection</h3>
+  <div class="gap-lg"></div>
+  <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
+    <span class="pill pill-green">Go 1.22+</span>
+    <span class="pill pill-accent">OTel Native</span>
+    <span class="pill pill-blue">Apache-2.0</span>
+  </div>
+  <div class="gap-lg"></div>
+  <div style="color:var(--text-dim); font-size:0.85rem;">Press <span class="mono" style="color:var(--accent)">→</span> or click <strong>Next</strong> to begin</div>
+</div>
+
+<!-- ═══════════════ SCENE 1 — THE PROBLEM ═══════════════ -->
+<div class="scene" id="scene-1">
+  <h2>The Problem</h2>
+  <div class="gap-sm"></div>
+  <h3 style="max-width:650px;">Your AI traces are leaking secrets, PII, and raw prompts into every observability backend. Every team re-invents redaction. Nobody catches runaway agents.</h3>
+  <div class="gap-md"></div>
+  <div class="code-block" style="max-width:600px; text-align:center; border-color:var(--red);">
+    <div class="line visible" style="text-align:center; font-size:0.85rem; color:var(--red); font-weight:600;">gen_ai.prompt = "My API key is sk-abc123secretkey456..."</div>
+    <div class="line visible" style="text-align:center; font-size:0.85rem; color:var(--red); font-weight:600; margin-top:4px;">authorization = "Bearer eyJhbGciOi..."</div>
+  </div>
+  <div class="gap-lg"></div>
+  <div class="stats-grid">
+    <div class="stat-card" data-delay="200"><div class="stat-number" style="color:var(--red)">0</div><div class="stat-label">Redaction</div></div>
+    <div class="stat-card" data-delay="400"><div class="stat-number" style="color:var(--red)">0</div><div class="stat-label">PII Protection</div></div>
+    <div class="stat-card" data-delay="600"><div class="stat-number" style="color:var(--red)">0</div><div class="stat-label">Cost Tracking</div></div>
+    <div class="stat-card" data-delay="800"><div class="stat-number" style="color:var(--red)">0</div><div class="stat-label">Loop Detection</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCENE 2 — WHY COLLECTOR-SIDE ═══════════════ -->
+<div class="scene" id="scene-2">
+  <h2>Why <span class="gradient-text">Collector-Side?</span></h2>
+  <div class="gap-sm"></div>
+  <h3>One config change. All services. No redeployments.</h3>
+  <div class="gap-md"></div>
+  <table class="compare-table" id="compare-table">
+    <thead><tr class="visible"><th></th><th>App-Side SDK</th><th style="color:var(--accent)">Collector Processor</th></tr></thead>
+    <tbody>
+      <tr data-delay="300"><td>Prompt redaction</td><td style="color:var(--red)">Every team re-invents it</td><td style="color:var(--green)"><strong>One config, all services</strong></td></tr>
+      <tr data-delay="600"><td>Secret leakage</td><td style="color:var(--red)">Easy to miss</td><td style="color:var(--green)">Denylist regex catches it</td></tr>
+      <tr data-delay="900"><td>Token/cost metrics</td><td style="color:var(--red)">Scattered implementations</td><td style="color:var(--green)">Normalised, unified</td></tr>
+      <tr data-delay="1200"><td>Runaway detection</td><td style="color:var(--red)">Not usually done</td><td style="color:var(--green)">Built-in loop detector</td></tr>
+      <tr data-delay="1500"><td>Deployment</td><td style="color:var(--red)">Redeploy every app</td><td style="color:var(--green)">Config change only</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════ SCENE 3 — HOW IT WORKS ═══════════════ -->
+<div class="scene" id="scene-3">
+  <h2>How It Works</h2>
+  <div class="gap-sm"></div>
+  <h3>Drop into any OTel Collector pipeline — no application code changes</h3>
+  <div class="gap-lg"></div>
+  <div class="flow-container" id="flow-arch">
+    <div class="flow-node" data-delay="200">
+      <div class="flow-icon">🤖</div>
+      <div class="flow-label">Your Agent</div>
+    </div>
+    <div class="flow-arrow" data-delay="400">→</div>
+    <div class="flow-node" data-delay="500">
+      <div class="flow-icon">📡</div>
+      <div class="flow-label">OTLP<br>Export</div>
+    </div>
+    <div class="flow-arrow" data-delay="700">→</div>
+    <div class="flow-node" data-delay="800">
+      <div class="flow-icon" style="border-color:var(--accent);">🛡️</div>
+      <div class="flow-label" style="color:var(--accent);">genaisafe<br>Processor</div>
+    </div>
+    <div class="flow-arrow" data-delay="1000">→</div>
+    <div class="flow-node" data-delay="1100">
+      <div class="flow-icon">📊</div>
+      <div class="flow-label">Jaeger /<br>Prometheus</div>
+    </div>
+  </div>
+  <div class="gap-md"></div>
+  <div class="flow-container" id="flow-features">
+    <div class="flow-node" data-delay="1500">
+      <div class="flow-icon">🔒</div>
+      <div class="flow-label">Redact</div>
+    </div>
+    <div class="flow-arrow" data-delay="1700">+</div>
+    <div class="flow-node" data-delay="1800">
+      <div class="flow-icon">📈</div>
+      <div class="flow-label">Extract<br>Metrics</div>
+    </div>
+    <div class="flow-arrow" data-delay="2000">+</div>
+    <div class="flow-node" data-delay="2100">
+      <div class="flow-icon">🔁</div>
+      <div class="flow-label">Detect<br>Loops</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCENE 4 — REDACTION ═══════════════ -->
+<div class="scene" id="scene-4">
+  <h2><span style="color:var(--accent)">Redaction Engine</span> — 4 Privacy Modes</h2>
+  <div class="gap-sm"></div>
+  <h3>SHA-256 hashes for correlation. Preview chars for debugging. Denylist for secrets.</h3>
+  <div class="gap-md"></div>
+  <div class="stats-grid">
+    <div class="stat-card" data-delay="200"><div class="stat-number" style="color:var(--red); font-size:1.4rem;">drop</div><div class="stat-label">Remove entirely</div></div>
+    <div class="stat-card" data-delay="400"><div class="stat-number" style="color:var(--accent); font-size:1.4rem;">hash</div><div class="stat-label">SHA-256 only</div></div>
+    <div class="stat-card" data-delay="600"><div class="stat-number" style="color:var(--green); font-size:1.4rem;">hash+preview</div><div class="stat-label">Hash + first N chars</div></div>
+    <div class="stat-card" data-delay="800"><div class="stat-number" style="color:var(--blue); font-size:1.4rem;">truncate</div><div class="stat-label">Cut at N chars</div></div>
+  </div>
+  <div class="gap-md"></div>
+  <div class="terminal" id="redact-terminal">
+    <div class="term-line" data-delay="1200"><span class="info">[genaisafe:redact]</span> Mode: hash_and_preview (48 chars)</div>
+    <div class="term-line" data-delay="1600"><span class="warn">[genaisafe:denylist]</span> <span class="warn">Pattern match: sk-[a-z0-9]{20,} → [REDACTED]</span></div>
+    <div class="term-line" data-delay="2000"><span class="warn">[genaisafe:denylist]</span> <span class="warn">Pattern match: Bearer .* → [REDACTED]</span></div>
+    <div class="term-line" data-delay="2400"><span class="success">[genaisafe:redact]</span> <span class="success">gen_ai.prompt.hash = sha256:a3f2b8c1d4e5...</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCENE 5 — BEFORE / AFTER ═══════════════ -->
+<div class="scene" id="scene-5">
+  <h2>Before / <span class="gradient-text">After</span></h2>
+  <div class="gap-sm"></div>
+  <h3>See exactly what changes when a span passes through the processor</h3>
+  <div class="gap-md"></div>
+  <div class="diff-container">
+    <div class="diff-panel" id="diff-before">
+      <div class="diff-title" style="color:var(--red);">⬤ Before (Raw Span)</div>
+      <div class="line redacted visible" style="opacity:1; transform:none;">gen_ai.prompt = <span class="str">"What is the API key? My key is sk-abc123secretkey456..."</span></div>
+      <div class="line redacted visible" style="opacity:1; transform:none; margin-top:4px;">gen_ai.usage.prompt_tokens = <span class="num">150</span></div>
+      <div class="line redacted visible" style="opacity:1; transform:none; margin-top:4px;">gen_ai.usage.completion_tokens = <span class="num">42</span></div>
+      <div class="line redacted visible" style="opacity:1; transform:none; margin-top:4px;">authorization = <span class="str">"Bearer eyJhbGciOi..."</span></div>
+    </div>
+    <div class="diff-panel" id="diff-after">
+      <div class="diff-title" style="color:var(--green);">⬤ After (Processed)</div>
+      <div class="line safe" data-delay="400" style="transform:none;">gen_ai.prompt = <span class="str">"What is the API key? My key is sk-abc123secr..."</span></div>
+      <div class="line safe" data-delay="700" style="transform:none;">gen_ai.prompt.hash = <span class="str">"a3f2b8c1d4e5..."</span></div>
+      <div class="line safe" data-delay="1000" style="transform:none;">genai.tokens.prompt = <span class="num">150</span></div>
+      <div class="line safe" data-delay="1300" style="transform:none;">genai.tokens.completion = <span class="num">42</span></div>
+      <div class="line safe" data-delay="1600" style="transform:none;">genai.tokens.total = <span class="num">192</span></div>
+      <div class="line safe" data-delay="1900" style="transform:none;">authorization = <span class="error">[REDACTED]</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCENE 6 — METRICS ═══════════════ -->
+<div class="scene" id="scene-6">
+  <h2><span style="color:var(--green)">Token & Cost Metrics</span></h2>
+  <div class="gap-sm"></div>
+  <h3>Auto-extracts, normalises, and unifies token counts from any GenAI span attribute format</h3>
+  <div class="gap-md"></div>
+  <div class="terminal" id="metrics-terminal">
+    <div class="term-line" data-delay="300"><span class="info">[genaisafe:metrics]</span> Scanning span attributes...</div>
+    <div class="term-line" data-delay="800"><span class="dim">  Found: gen_ai.usage.prompt_tokens = 150</span></div>
+    <div class="term-line" data-delay="1100"><span class="dim">  Found: gen_ai.usage.completion_tokens = 42</span></div>
+    <div class="term-line" data-delay="1500"><span class="success">[genaisafe:metrics]</span> <span class="success">Normalised → genai.tokens.prompt = 150</span></div>
+    <div class="term-line" data-delay="1800"><span class="success">[genaisafe:metrics]</span> <span class="success">Normalised → genai.tokens.completion = 42</span></div>
+    <div class="term-line" data-delay="2100"><span class="success">[genaisafe:metrics]</span> <span class="success">Computed  → genai.tokens.total = 192</span></div>
+    <div class="term-line" data-delay="2500"><span class="info">[genaisafe:metrics]</span> Also reads <span class="dim">llm.*</span> variants for backwards compat</div>
+    <div class="term-line" data-delay="2900"><span class="info">[genaisafe:metrics]</span> Extracts <span class="warn">genai.cost.usd</span> when present</div>
+  </div>
+  <div class="gap-md"></div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+    <span class="pill pill-green">Auto-Normalise</span>
+    <span class="pill pill-accent">Periodic Summary</span>
+    <span class="pill pill-blue">gen_ai.* + llm.*</span>
+    <span class="pill pill-orange">Cost Extraction</span>
+  </div>
+</div>
+
+<!-- ═══════════════ SCENE 7 — LOOP DETECTION ═══════════════ -->
+<div class="scene" id="scene-7">
+  <h2><span style="color:var(--orange)">Runaway / Loop Detection</span></h2>
+  <div class="gap-sm"></div>
+  <h3>Catches autonomous agents stuck in infinite tool-calling loops before they burn through your budget</h3>
+  <div class="gap-md"></div>
+  <div class="terminal" id="loop-terminal">
+    <div class="term-line" data-delay="300"><span class="prompt">agent →</span> <span class="output">tool_call: search_database (1/6)</span></div>
+    <div class="term-line" data-delay="600"><span class="prompt">agent →</span> <span class="output">tool_call: search_database (2/6)</span></div>
+    <div class="term-line" data-delay="900"><span class="prompt">agent →</span> <span class="output">tool_call: search_database (3/6)</span></div>
+    <div class="term-line" data-delay="1200"><span class="prompt">agent →</span> <span class="output">tool_call: search_database (4/6)</span></div>
+    <div class="term-line" data-delay="1500"><span class="prompt">agent →</span> <span class="output">tool_call: search_database (5/6)</span></div>
+    <div class="term-line" data-delay="1800"><span class="prompt">agent →</span> <span class="output">tool_call: search_database (6/6)</span></div>
+    <div class="term-line" data-delay="2300"><span class="error">[genaisafe:loop]</span> <span class="error">THRESHOLD EXCEEDED — 6 repeated tool calls detected</span></div>
+    <div class="term-line" data-delay="2800"><span class="error">[genaisafe:loop]</span> <span class="error">Flagging all spans: genai.risk.loop_suspected = true</span></div>
+    <div class="term-line" data-delay="3300"><span class="info">[genaisafe:loop]</span> Regex match: <span class="dim">(?i)tool|function|call</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCENE 8 — CONFIGURATION ═══════════════ -->
+<div class="scene" id="scene-8">
+  <h2>Simple <span class="gradient-text">YAML Config</span></h2>
+  <div class="gap-sm"></div>
+  <h3>Drop into your existing collector config — all features are toggleable</h3>
+  <div class="gap-md"></div>
+  <div class="code-block">
+    <div class="code-header">
+      <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
+      <span class="code-title">otelcol-config.yaml</span>
+    </div>
+    <div class="line" data-delay="200"><span class="kw">processors:</span></div>
+    <div class="line" data-delay="350">  <span class="kw">genaisafe:</span></div>
+    <div class="line highlight" data-delay="500">    <span class="kw">redact:</span></div>
+    <div class="line highlight" data-delay="650">      <span class="kw">mode:</span> <span class="str">"hash_and_preview"</span></div>
+    <div class="line highlight" data-delay="800">      <span class="kw">preview_chars:</span> <span class="num">48</span></div>
+    <div class="line highlight" data-delay="950">      <span class="kw">keys:</span> [<span class="str">"gen_ai.prompt"</span>, <span class="str">"gen_ai.completion"</span>]</div>
+    <div class="line" data-delay="1100">      <span class="kw">denylist_regex:</span></div>
+    <div class="line" data-delay="1250">        - <span class="str">"(?i)sk-[a-z0-9]{20,}"</span></div>
+    <div class="line" data-delay="1400">        - <span class="str">"(?i)api[_-]?key"</span></div>
+    <div class="line highlight" data-delay="1600">    <span class="kw">metrics:</span></div>
+    <div class="line highlight" data-delay="1750">      <span class="kw">enable:</span> <span class="cls">true</span></div>
+    <div class="line highlight" data-delay="1900">    <span class="kw">loop_detection:</span></div>
+    <div class="line highlight" data-delay="2050">      <span class="kw">enable:</span> <span class="cls">true</span></div>
+    <div class="line highlight" data-delay="2200">      <span class="kw">repeat_threshold:</span> <span class="num">6</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCENE 9 — DEMO STACK ═══════════════ -->
+<div class="scene" id="scene-9">
+  <h2>Try It: <span class="gradient-text">Docker Compose</span></h2>
+  <div class="gap-sm"></div>
+  <h3>Full demo stack with Jaeger + Prometheus in one command</h3>
+  <div class="gap-md"></div>
+  <div class="terminal" id="docker-terminal">
+    <div class="term-line" data-delay="300"><span class="prompt">$ </span><span class="output">cd examples && docker compose up --build</span></div>
+    <div class="term-line" data-delay="900"><span class="success">[+] Running 3/3</span></div>
+    <div class="term-line" data-delay="1300"><span class="dim"> ✔ Container otel-collector   Started</span></div>
+    <div class="term-line" data-delay="1600"><span class="dim"> ✔ Container jaeger           Started</span></div>
+    <div class="term-line" data-delay="1900"><span class="dim"> ✔ Container prometheus        Started</span></div>
+    <div class="term-line" data-delay="2400"><span class="info">[collector]</span> genaisafe processor loaded — redact: hash_and_preview, metrics: on, loops: on</div>
+    <div class="term-line" data-delay="2900"><span class="prompt">$ </span><span class="output">otel-cli span --endpoint localhost:4317 --name "chat_completion" \</span></div>
+    <div class="term-line" data-delay="3100"><span class="output">  --attrs "gen_ai.prompt=Tell me the secret password for sk-abc123xyz"</span></div>
+    <div class="term-line" data-delay="3600"><span class="success">[genaisafe]</span> <span class="success">Span processed — prompt redacted, tokens extracted, chain clean</span></div>
+  </div>
+  <div class="gap-md"></div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+    <span class="pill pill-blue">Jaeger :16686</span>
+    <span class="pill pill-orange">Prometheus :9090</span>
+    <span class="pill pill-green">OTLP :4317/4318</span>
+  </div>
+</div>
+
+<!-- ═══════════════ SCENE 10 — THREAT MODEL ═══════════════ -->
+<div class="scene" id="scene-10">
+  <h2>Threat Model</h2>
+  <div class="gap-sm"></div>
+  <h3>Four attack vectors, one processor</h3>
+  <div class="gap-lg"></div>
+  <div class="stats-grid">
+    <div class="stat-card" data-delay="200" style="border-color:var(--red);">
+      <div style="font-size:1.6rem; margin-bottom:8px;">🔓</div>
+      <div class="stat-label">Prompt Data Leakage</div>
+      <div style="color:var(--text-dim); font-size:0.65rem; margin-top:6px;">PII, secrets, proprietary data in traces</div>
+    </div>
+    <div class="stat-card" data-delay="400" style="border-color:var(--orange);">
+      <div style="font-size:1.6rem; margin-bottom:8px;">🔑</div>
+      <div class="stat-label">Secret Exposure</div>
+      <div style="color:var(--text-dim); font-size:0.65rem; margin-top:6px;">API keys, bearer tokens in attributes</div>
+    </div>
+    <div class="stat-card" data-delay="600" style="border-color:var(--purple);">
+      <div style="font-size:1.6rem; margin-bottom:8px;">🔁</div>
+      <div class="stat-label">Runaway Loops</div>
+      <div style="color:var(--text-dim); font-size:0.65rem; margin-top:6px;">Infinite tool calls burning budget</div>
+    </div>
+    <div class="stat-card" data-delay="800" style="border-color:var(--blue);">
+      <div style="font-size:1.6rem; margin-bottom:8px;">💸</div>
+      <div class="stat-label">Cost Blind Spots</div>
+      <div style="color:var(--text-dim); font-size:0.65rem; margin-top:6px;">No normalised token/cost visibility</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCENE 11 — ECOSYSTEM ═══════════════ -->
+<div class="scene" id="scene-11">
+  <h2>Part of <span class="gradient-text">AIR Blackbox</span></h2>
+  <div class="gap-sm"></div>
+  <h3>The observability security layer for autonomous AI systems</h3>
+  <div class="gap-lg"></div>
+  <div class="stats-grid" style="grid-template-columns:repeat(4,1fr); max-width:800px;">
+    <div class="stat-card" data-delay="200" style="border-color:var(--accent);">
+      <div style="font-size:1.6rem; margin-bottom:8px;">🛡️</div>
+      <div class="stat-label">This Processor</div>
+      <div style="color:var(--accent); font-size:0.65rem; margin-top:4px;">OTel native</div>
+    </div>
+    <div class="stat-card" data-delay="400" style="border-color:var(--teal);">
+      <div style="font-size:1.6rem; margin-bottom:8px;">✈️</div>
+      <div class="stat-label">Gateway</div>
+      <div style="color:var(--teal); font-size:0.65rem; margin-top:4px;">Flight recorder</div>
+    </div>
+    <div class="stat-card" data-delay="600" style="border-color:var(--blue);">
+      <div style="font-size:1.6rem; margin-bottom:8px;">🐍</div>
+      <div class="stat-label">Python SDK</div>
+      <div style="color:var(--blue); font-size:0.65rem; margin-top:4px;">OpenAI + more</div>
+    </div>
+    <div class="stat-card" data-delay="800" style="border-color:var(--green);">
+      <div style="font-size:1.6rem; margin-bottom:8px;">🛡️</div>
+      <div class="stat-label">Trust Plugins</div>
+      <div style="color:var(--green); font-size:0.65rem; margin-top:4px;">4 frameworks</div>
+    </div>
+  </div>
+  <div class="gap-lg"></div>
+  <div class="code-block" style="max-width:500px; text-align:center;">
+    <div class="line visible" style="text-align:center; color: var(--text-dim);">pip install air-blackbox-sdk</div>
+    <div class="line visible" style="text-align:center; margin-top:4px;"><span style="color:var(--accent)">github.com/airblackbox</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCENE 12 — CTA ═══════════════ -->
+<div class="scene" id="scene-12">
+  <div class="pill pill-accent" style="margin-bottom: 20px;">GET STARTED</div>
+  <h1><span class="gradient-text">Harden Your GenAI Telemetry</span></h1>
+  <div class="gap-md"></div>
+  <h3 style="max-width:500px;">One processor. Zero code changes. Privacy by default.</h3>
+  <div class="gap-lg"></div>
+  <div class="code-block" style="max-width:560px;">
+    <div class="code-header">
+      <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
+      <span class="code-title">terminal</span>
+    </div>
+    <div class="line visible"><span class="prompt">$ </span>git clone github.com/nostalgicskinco/OpenTelemetry-Collector-Processor-GenAI-Perfect</div>
+    <div class="line visible"><span class="prompt">$ </span>cd examples && docker compose up --build</div>
+    <div class="line visible"><span class="cm"># That's it. Your traces are now safe.</span></div>
+  </div>
+  <div class="gap-lg"></div>
+  <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+    <span class="pill pill-accent" style="cursor:pointer; font-size:0.9rem; padding:10px 24px;">github.com/airblackbox</span>
+  </div>
+  <div class="gap-lg"></div>
+  <div style="color:var(--text-dim); font-size:0.8rem;">AIR Blackbox — Agent Infrastructure Runtime</div>
+</div>
+</div>
+
+<!-- Navigation -->
+<div id="nav">
+  <button class="nav-btn" id="prev-btn" disabled>← Prev</button>
+  <span id="scene-counter">1 / 13</span>
+  <button class="nav-btn" id="next-btn">Next →</button>
+</div>
+
+<script>
+// ── Particles ──
+const particleContainer = document.getElementById('particles');
+for (let i = 0; i < 30; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.left = Math.random() * 100 + 'vw';
+  p.style.top = Math.random() * 100 + 'vh';
+  p.style.animationDelay = Math.random() * 8 + 's';
+  p.style.animationDuration = (6 + Math.random() * 6) + 's';
+  const colors = ['var(--accent)', 'var(--red)', 'var(--orange)', 'var(--green)', 'var(--blue)'];
+  p.style.background = colors[Math.floor(Math.random() * colors.length)];
+  particleContainer.appendChild(p);
+}
+
+// ─┈ Scene Management ──
+const totalScenes = 13;
+let current = 0;
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const counter = document.getElementById('scene-counter');
+const progressBar = document.getElementById('progress-bar');
+
+function updateNav() {
+  prevBtn.disabled = current === 0;
+  nextBtn.disabled = current === totalScenes - 1;
+  counter.textContent = `${current + 1} / ${totalScenes}`;
+  progressBar.style.width = ((current / (totalScenes - 1)) * 100) + '%';
+}
+
+function goToScene(n) {
+  if (n < 0 || n >= totalScenes) return;
+  const oldScene = document.getElementById('scene-' + current);
+  oldScene.classList.remove('active');
+  oldScene.classList.add('exit');
+  current = n;
+  const newScene = document.getElementById('scene-' + current);
+  setTimeout(() => {
+    oldScene.classList.remove('exit');
+    newScene.classList.add('active');
+    updateNav();
+    animateScene(current);
+  }, 200);
+}
+
+prevBtn.addEventListener('click', () => goToScene(current - 1));
+nextBtn.addEventListener('click', () => goToScene(current + 1));
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goToScene(current + 1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); goToScene(current - 1); }
+});
+
+// ─┈ Animate Scene Elements ──
+function animateScene(sceneIndex) {
+  const scene = document.getElementById('scene-' + sceneIndex);
+
+  scene.querySelectorAll('.code-block .line').forEach(line => {
+    const delay = parseInt(line.dataset.delay || 0);
+    setTimeout(() => line.classList.add('visible'), delay);
+  });
+
+  scene.querySelectorAll('.stat-card').forEach(card => {
+    const delay = parseInt(card.dataset.delay || 0);
+    setTimeout(() => card.classList.add('visible'), delay);
+  });
+
+  scene.querySelectorAll('.flow-node').forEach(node => {
+    const delay = parseInt(node.dataset.delay || 0);
+    setTimeout(() => node.classList.add('visible'), delay);
+  });
+  scene.querySelectorAll('.flow-arrow').forEach(arrow => {
+    const delay = parseInt(arrow.dataset.delay || 0);
+    setTimeout(() => arrow.classList.add('visible'), delay);
+  });
+
+  scene.querySelectorAll('.term-line').forEach(line => {
+    const delay = parseInt(line.dataset.delay || 0);
+    setTimeout(() => line.classList.add('visible'), delay);
+  });
+
+  scene.querySelectorAll('.compare-table tbody tr').forEach(row => {
+    const delay = parseInt(row.dataset.delay || 0);
+    setTimeout(() => row.classList.add('visible'), delay);
+  });
+
+  // Diff panel lines (scene 5)
+  scene.querySelectorAll('#diff-after .line').forEach(line => {
+    const delay = parseInt(line.dataset.delay || 0);
+    setTimeout(() => line.classList.add('visible'), delay);
+  });
+}
+
+// Initial state
+updateNav();
+animateScene(0);
+</script>
+</body>
+</html>

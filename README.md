@@ -1,5 +1,7 @@
 # opentelemetry-collector-processor-genai
 
+[**View Interactive Demo**](https://htmlpreview.github.io/?https://github.com/airblackbox/otel-collector-genai/blob/main/demo.html)
+
 An OpenTelemetry Collector processor for AI safety: PII redaction, infinite loop detection, and token metrics for LLM traces.
 
 ## Features
@@ -40,7 +42,7 @@ processors:
 
 ## Part of the AIR Platform
 
-This processor is one component of the [AIR Blackbox Gateway](https://github.com/nostalgicskinco/air-blackbox-gateway) collector pipeline.
+This processor is one component of the [AIR Blackbox Gateway](https://github.com/airblackbox/gateway) collector pipeline.
 
 ## License
 
