@@ -5,6 +5,7 @@ import (
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/ptrace"
 	"go.uber.org/zap"
 )
@@ -88,14 +89,14 @@ func (p *genaiSafeProcessor) processSpan(span ptrace.Span) {
 	}
 }
 
-func (p *genaiSafeProcessor) redactAttributes(attrs ptrace.Map) {
+func (p *genaiSafeProcessor) redactAttributes(attrs pcommon.Map) {
 	type redaction struct {
 		key   string
 		value string
 	}
 	var toRedact []redaction
 
-	attrs.Range(func(key string, val ptrace.Value) bool {
+	attrs.Range(func(key string, val pcommon.Value) bool {
 		strVal := val.Str()
 		if strVal == "" {
 			return true
@@ -119,7 +120,7 @@ func (p *genaiSafeProcessor) redactAttributes(attrs ptrace.Map) {
 	}
 }
 
-func (p *genaiSafeProcessor) detectLoops(span ptrace.Span, attrs ptrace.Map) {
+func (p *genaiSafeProcessor) detectLoops(span ptrace.Span, attrs pcommon.Map) {
 	prompt, exists := attrs.Get("gen_ai.prompt")
 	if !exists {
 		return
@@ -138,7 +139,7 @@ func (p *genaiSafeProcessor) detectLoops(span ptrace.Span, attrs ptrace.Map) {
 	}
 }
 
-func (p *genaiSafeProcessor) addMetrics(attrs ptrace.Map) {
+func (p *genaiSafeProcessor) addMetrics(attrs pcommon.Map) {
 	// Calculate total tokens if individual counts are present
 	inputTokens, hasInput := attrs.Get("gen_ai.usage.input_tokens")
 	outputTokens, hasOutput := attrs.Get("gen_ai.usage.output_tokens")

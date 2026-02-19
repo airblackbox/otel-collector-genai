@@ -1,4 +1,4 @@
-module github.com/nostalgicskinco/opentelemetry-collector-processor-genai
+module github.com/airblackbox/otel-collector-genai
 
 go 1.22
 
