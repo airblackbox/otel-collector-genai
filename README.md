@@ -1,5 +1,10 @@
 # opentelemetry-collector-processor-genai
 
+[![CI](https://github.com/airblackbox/otel-collector-genai/actions/workflows/ci.yml/badge.svg)](https://github.com/airblackbox/otel-collector-genai/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/airblackbox/otel-collector-genai/blob/main/LICENSE)
+[![Go](https://img.shields.io/badge/Go-1.22+-00ADD8.svg?logo=go&logoColor=white)](https://golang.org)
+
+
 [**View Interactive Demo**](https://htmlpreview.github.io/?https://github.com/airblackbox/otel-collector-genai/blob/main/demo.html)
 
 An OpenTelemetry Collector processor for AI safety: PII redaction, infinite loop detection, and token metrics for LLM traces.
