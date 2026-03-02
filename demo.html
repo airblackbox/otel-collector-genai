@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>otelcol-genai-safe — Interactive Demo</title>
+<title>otelcol-genai-safe â Interactive Demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -31,14 +31,14 @@
   }
   .mono { font-family: 'JetBrains Mono', monospace; }
 
-  /* ── Progress bar ── */
+  /* ââ Progress bar ââ */
   #progress-bar {
     position: fixed; top: 0; left: 0; height: 3px;
     background: linear-gradient(90deg, var(--accent), var(--orange));
     transition: width 0.4s ease; z-index: 200;
   }
 
-  /* ── Scene framework ── */
+  /* ââ Scene framework ââ */
   #scene-container { position: relative; width: 100%; height: 100vh; }
   .scene {
     position: absolute; inset: 0;
@@ -63,7 +63,7 @@
     background-clip: text;
   }
 
-  /* ── Pills ── */
+  /* ââ Pills ââ */
   .pill {
     display: inline-block; padding: 6px 16px;
     border-radius: 20px; font-size: 0.75rem;
@@ -78,7 +78,7 @@
   .pill-purple { background: rgba(167,139,250,0.08); color: var(--purple); border-color: rgba(167,139,250,0.2); }
   .pill-teal { background: rgba(0,173,216,0.08); color: var(--teal); border-color: rgba(0,173,216,0.2); }
 
-  /* ── Code blocks ── */
+  /* ââ Code blocks ââ */
   .code-block {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 12px; padding: 20px 24px;
@@ -108,7 +108,7 @@
   .line.redacted { background: rgba(248,113,113,0.06); margin: 0 -24px; padding: 0 24px; border-left: 2px solid var(--red); }
   .line.safe { background: rgba(52,211,153,0.06); margin: 0 -24px; padding: 0 24px; border-left: 2px solid var(--green); }
 
-  /* ── Terminal ── */
+  /* ââ Terminal ââ */
   .terminal {
     background: #0c0c14; border: 1px solid var(--border);
     border-radius: 12px; padding: 20px 24px;
@@ -126,7 +126,7 @@
   .error { color: var(--red); }
   .dim { color: var(--text-dim); }
 
-  /* ── Stats grid ── */
+  /* ââ Stats grid ââ */
   .stats-grid {
     display: grid; grid-template-columns: repeat(4, 1fr);
     gap: 16px; max-width: 750px; width: 100%;
@@ -141,7 +141,7 @@
   .stat-number { font-size: 2rem; font-weight: 900; }
   .stat-label { font-size: 0.7rem; color: var(--text-dim); margin-top: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
 
-  /* ── Flow / Architecture ── */
+  /* ââ Flow / Architecture ââ */
   .flow-container {
     display: flex; align-items: center; justify-content: center;
     gap: 12px; flex-wrap: wrap; max-width: 800px;
@@ -161,7 +161,7 @@
   .flow-arrow { color: var(--accent); font-size: 1.2rem; opacity: 0; transition: all 0.3s ease; }
   .flow-arrow.visible { opacity: 1; }
 
-  /* ── Compare table ── */
+  /* ââ Compare table ââ */
   .compare-table {
     width: 100%; max-width: 750px;
     border-collapse: collapse; font-size: 0.8rem;
@@ -179,7 +179,7 @@
   }
   .compare-table tbody tr.visible { opacity: 1; transform: translateX(0); }
 
-  /* ── Before/After diff ── */
+  /* ââ Before/After diff ââ */
   .diff-container {
     display: grid; grid-template-columns: 1fr 1fr;
     gap: 16px; max-width: 800px; width: 100%;
@@ -196,12 +196,12 @@
     border-bottom: 1px solid var(--border);
   }
 
-  /* ── Spacers ── */
+  /* ââ Spacers ââ */
   .gap-sm { height: 16px; }
   .gap-md { height: 28px; }
   .gap-lg { height: 40px; }
 
-  /* ── Particles ── */
+  /* ââ Particles ââ */
   .particle {
     position: fixed; width: 4px; height: 4px;
     background: var(--accent); border-radius: 50%;
@@ -215,7 +215,7 @@
     75% { transform: translateY(-40px) translateX(10px); }
   }
 
-  /* ── Navigation ── */
+  /* ââ Navigation ââ */
   #nav {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
     display: flex; align-items: center; gap: 16px; z-index: 100;
@@ -240,13 +240,13 @@
 <!-- Progress bar -->
 <div id="progress-bar" style="width:0%"></div>
 
-<!-- ═══════════════ SCENE 0 — TITLE ═══════════════ -->
+<!-- âââââââââââââââ SCENE 0 â TITLE âââââââââââââââ -->
 <div id="scene-container">
 <div class="scene active" id="scene-0">
   <div class="pill pill-accent" style="margin-bottom: 20px;">AIR BLACKBOX</div>
   <h1><span class="gradient-text">otelcol-genai-safe</span></h1>
   <div class="gap-sm"></div>
-  <h3>OpenTelemetry Collector Processor for GenAI — privacy-by-default redaction, cost metrics, and loop detection</h3>
+  <h3>OpenTelemetry Collector Processor for GenAI â privacy-by-default redaction, cost metrics, and loop detection</h3>
   <div class="gap-lg"></div>
   <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
     <span class="pill pill-green">Go 1.22+</span>
@@ -254,10 +254,10 @@
     <span class="pill pill-blue">Apache-2.0</span>
   </div>
   <div class="gap-lg"></div>
-  <div style="color:var(--text-dim); font-size:0.85rem;">Press <span class="mono" style="color:var(--accent)">→</span> or click <strong>Next</strong> to begin</div>
+  <div style="color:var(--text-dim); font-size:0.85rem;">Press <span class="mono" style="color:var(--accent)">â</span> or click <strong>Next</strong> to begin</div>
 </div>
 
-<!-- ═══════════════ SCENE 1 — THE PROBLEM ═══════════════ -->
+<!-- âââââââââââââââ SCENE 1 â THE PROBLEM âââââââââââââââ -->
 <div class="scene" id="scene-1">
   <h2>The Problem</h2>
   <div class="gap-sm"></div>
@@ -276,7 +276,7 @@
   </div>
 </div>
 
-<!-- ═══════════════ SCENE 2 — WHY COLLECTOR-SIDE ═══════════════ -->
+<!-- âââââââââââââââ SCENE 2 â WHY COLLECTOR-SIDE âââââââââââââââ -->
 <div class="scene" id="scene-2">
   <h2>Why <span class="gradient-text">Collector-Side?</span></h2>
   <div class="gap-sm"></div>
@@ -294,55 +294,55 @@
   </table>
 </div>
 
-<!-- ═══════════════ SCENE 3 — HOW IT WORKS ═══════════════ -->
+<!-- âââââââââââââââ SCENE 3 â HOW IT WORKS âââââââââââââââ -->
 <div class="scene" id="scene-3">
   <h2>How It Works</h2>
   <div class="gap-sm"></div>
-  <h3>Drop into any OTel Collector pipeline — no application code changes</h3>
+  <h3>Drop into any OTel Collector pipeline â no application code changes</h3>
   <div class="gap-lg"></div>
   <div class="flow-container" id="flow-arch">
     <div class="flow-node" data-delay="200">
-      <div class="flow-icon">🤖</div>
+      <div class="flow-icon">ð¤</div>
       <div class="flow-label">Your Agent</div>
     </div>
-    <div class="flow-arrow" data-delay="400">→</div>
+    <div class="flow-arrow" data-delay="400">â</div>
     <div class="flow-node" data-delay="500">
-      <div class="flow-icon">📡</div>
+      <div class="flow-icon">ð¡</div>
       <div class="flow-label">OTLP<br>Export</div>
     </div>
-    <div class="flow-arrow" data-delay="700">→</div>
+    <div class="flow-arrow" data-delay="700">â</div>
     <div class="flow-node" data-delay="800">
-      <div class="flow-icon" style="border-color:var(--accent);">🛡️</div>
+      <div class="flow-icon" style="border-color:var(--accent);">ð¡ï¸</div>
       <div class="flow-label" style="color:var(--accent);">genaisafe<br>Processor</div>
     </div>
-    <div class="flow-arrow" data-delay="1000">→</div>
+    <div class="flow-arrow" data-delay="1000">â</div>
     <div class="flow-node" data-delay="1100">
-      <div class="flow-icon">📊</div>
+      <div class="flow-icon">ð</div>
       <div class="flow-label">Jaeger /<br>Prometheus</div>
     </div>
   </div>
   <div class="gap-md"></div>
   <div class="flow-container" id="flow-features">
     <div class="flow-node" data-delay="1500">
-      <div class="flow-icon">🔒</div>
+      <div class="flow-icon">ð</div>
       <div class="flow-label">Redact</div>
     </div>
     <div class="flow-arrow" data-delay="1700">+</div>
     <div class="flow-node" data-delay="1800">
-      <div class="flow-icon">📈</div>
+      <div class="flow-icon">ð</div>
       <div class="flow-label">Extract<br>Metrics</div>
     </div>
     <div class="flow-arrow" data-delay="2000">+</div>
     <div class="flow-node" data-delay="2100">
-      <div class="flow-icon">🔁</div>
+      <div class="flow-icon">ð</div>
       <div class="flow-label">Detect<br>Loops</div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ SCENE 4 — REDACTION ═══════════════ -->
+<!-- âââââââââââââââ SCENE 4 â REDACTION âââââââââââââââ -->
 <div class="scene" id="scene-4">
-  <h2><span style="color:var(--accent)">Redaction Engine</span> — 4 Privacy Modes</h2>
+  <h2><span style="color:var(--accent)">Redaction Engine</span> â 4 Privacy Modes</h2>
   <div class="gap-sm"></div>
   <h3>SHA-256 hashes for correlation. Preview chars for debugging. Denylist for secrets.</h3>
   <div class="gap-md"></div>
@@ -355,13 +355,13 @@
   <div class="gap-md"></div>
   <div class="terminal" id="redact-terminal">
     <div class="term-line" data-delay="1200"><span class="info">[genaisafe:redact]</span> Mode: hash_and_preview (48 chars)</div>
-    <div class="term-line" data-delay="1600"><span class="warn">[genaisafe:denylist]</span> <span class="warn">Pattern match: sk-[a-z0-9]{20,} → [REDACTED]</span></div>
-    <div class="term-line" data-delay="2000"><span class="warn">[genaisafe:denylist]</span> <span class="warn">Pattern match: Bearer .* → [REDACTED]</span></div>
+    <div class="term-line" data-delay="1600"><span class="warn">[genaisafe:denylist]</span> <span class="warn">Pattern match: sk-[a-z0-9]{20,} â [REDACTED]</span></div>
+    <div class="term-line" data-delay="2000"><span class="warn">[genaisafe:denylist]</span> <span class="warn">Pattern match: Bearer .* â [REDACTED]</span></div>
     <div class="term-line" data-delay="2400"><span class="success">[genaisafe:redact]</span> <span class="success">gen_ai.prompt.hash = sha256:a3f2b8c1d4e5...</span></div>
   </div>
 </div>
 
-<!-- ═══════════════ SCENE 5 — BEFORE / AFTER ═══════════════ -->
+<!-- âââââââââââââââ SCENE 5 â BEFORE / AFTER âââââââââââââââ -->
 <div class="scene" id="scene-5">
   <h2>Before / <span class="gradient-text">After</span></h2>
   <div class="gap-sm"></div>
@@ -369,14 +369,14 @@
   <div class="gap-md"></div>
   <div class="diff-container">
     <div class="diff-panel" id="diff-before">
-      <div class="diff-title" style="color:var(--red);">⬤ Before (Raw Span)</div>
+      <div class="diff-title" style="color:var(--red);">â¬¤ Before (Raw Span)</div>
       <div class="line redacted visible" style="opacity:1; transform:none;">gen_ai.prompt = <span class="str">"What is the API key? My key is sk-abc123secretkey456..."</span></div>
       <div class="line redacted visible" style="opacity:1; transform:none; margin-top:4px;">gen_ai.usage.prompt_tokens = <span class="num">150</span></div>
       <div class="line redacted visible" style="opacity:1; transform:none; margin-top:4px;">gen_ai.usage.completion_tokens = <span class="num">42</span></div>
       <div class="line redacted visible" style="opacity:1; transform:none; margin-top:4px;">authorization = <span class="str">"Bearer eyJhbGciOi..."</span></div>
     </div>
     <div class="diff-panel" id="diff-after">
-      <div class="diff-title" style="color:var(--green);">⬤ After (Processed)</div>
+      <div class="diff-title" style="color:var(--green);">â¬¤ After (Processed)</div>
       <div class="line safe" data-delay="400" style="transform:none;">gen_ai.prompt = <span class="str">"What is the API key? My key is sk-abc123secr..."</span></div>
       <div class="line safe" data-delay="700" style="transform:none;">gen_ai.prompt.hash = <span class="str">"a3f2b8c1d4e5..."</span></div>
       <div class="line safe" data-delay="1000" style="transform:none;">genai.tokens.prompt = <span class="num">150</span></div>
@@ -387,7 +387,7 @@
   </div>
 </div>
 
-<!-- ═══════════════ SCENE 6 — METRICS ═══════════════ -->
+<!-- âââââââââââââââ SCENE 6 â METRICS âââââââââââââââ -->
 <div class="scene" id="scene-6">
   <h2><span style="color:var(--green)">Token & Cost Metrics</span></h2>
   <div class="gap-sm"></div>
@@ -397,9 +397,9 @@
     <div class="term-line" data-delay="300"><span class="info">[genaisafe:metrics]</span> Scanning span attributes...</div>
     <div class="term-line" data-delay="800"><span class="dim">  Found: gen_ai.usage.prompt_tokens = 150</span></div>
     <div class="term-line" data-delay="1100"><span class="dim">  Found: gen_ai.usage.completion_tokens = 42</span></div>
-    <div class="term-line" data-delay="1500"><span class="success">[genaisafe:metrics]</span> <span class="success">Normalised → genai.tokens.prompt = 150</span></div>
-    <div class="term-line" data-delay="1800"><span class="success">[genaisafe:metrics]</span> <span class="success">Normalised → genai.tokens.completion = 42</span></div>
-    <div class="term-line" data-delay="2100"><span class="success">[genaisafe:metrics]</span> <span class="success">Computed  → genai.tokens.total = 192</span></div>
+    <div class="term-line" data-delay="1500"><span class="success">[genaisafe:metrics]</span> <span class="success">Normalised â genai.tokens.prompt = 150</span></div>
+    <div class="term-line" data-delay="1800"><span class="success">[genaisafe:metrics]</span> <span class="success">Normalised â genai.tokens.completion = 42</span></div>
+    <div class="term-line" data-delay="2100"><span class="success">[genaisafe:metrics]</span> <span class="success">Computed  â genai.tokens.total = 192</span></div>
     <div class="term-line" data-delay="2500"><span class="info">[genaisafe:metrics]</span> Also reads <span class="dim">llm.*</span> variants for backwards compat</div>
     <div class="term-line" data-delay="2900"><span class="info">[genaisafe:metrics]</span> Extracts <span class="warn">genai.cost.usd</span> when present</div>
   </div>
@@ -412,30 +412,30 @@
   </div>
 </div>
 
-<!-- ═══════════════ SCENE 7 — LOOP DETECTION ═══════════════ -->
+<!-- âââââââââââââââ SCENE 7 â LOOP DETECTION âââââââââââââââ -->
 <div class="scene" id="scene-7">
   <h2><span style="color:var(--orange)">Runaway / Loop Detection</span></h2>
   <div class="gap-sm"></div>
   <h3>Catches autonomous agents stuck in infinite tool-calling loops before they burn through your budget</h3>
   <div class="gap-md"></div>
   <div class="terminal" id="loop-terminal">
-    <div class="term-line" data-delay="300"><span class="prompt">agent →</span> <span class="output">tool_call: search_database (1/6)</span></div>
-    <div class="term-line" data-delay="600"><span class="prompt">agent →</span> <span class="output">tool_call: search_database (2/6)</span></div>
-    <div class="term-line" data-delay="900"><span class="prompt">agent →</span> <span class="output">tool_call: search_database (3/6)</span></div>
-    <div class="term-line" data-delay="1200"><span class="prompt">agent →</span> <span class="output">tool_call: search_database (4/6)</span></div>
-    <div class="term-line" data-delay="1500"><span class="prompt">agent →</span> <span class="output">tool_call: search_database (5/6)</span></div>
-    <div class="term-line" data-delay="1800"><span class="prompt">agent →</span> <span class="output">tool_call: search_database (6/6)</span></div>
-    <div class="term-line" data-delay="2300"><span class="error">[genaisafe:loop]</span> <span class="error">THRESHOLD EXCEEDED — 6 repeated tool calls detected</span></div>
+    <div class="term-line" data-delay="300"><span class="prompt">agent â</span> <span class="output">tool_call: search_database (1/6)</span></div>
+    <div class="term-line" data-delay="600"><span class="prompt">agent â</span> <span class="output">tool_call: search_database (2/6)</span></div>
+    <div class="term-line" data-delay="900"><span class="prompt">agent â</span> <span class="output">tool_call: search_database (3/6)</span></div>
+    <div class="term-line" data-delay="1200"><span class="prompt">agent â</span> <span class="output">tool_call: search_database (4/6)</span></div>
+    <div class="term-line" data-delay="1500"><span class="prompt">agent â</span> <span class="output">tool_call: search_database (5/6)</span></div>
+    <div class="term-line" data-delay="1800"><span class="prompt">agent â</span> <span class="output">tool_call: search_database (6/6)</span></div>
+    <div class="term-line" data-delay="2300"><span class="error">[genaisafe:loop]</span> <span class="error">THRESHOLD EXCEEDED â 6 repeated tool calls detected</span></div>
     <div class="term-line" data-delay="2800"><span class="error">[genaisafe:loop]</span> <span class="error">Flagging all spans: genai.risk.loop_suspected = true</span></div>
     <div class="term-line" data-delay="3300"><span class="info">[genaisafe:loop]</span> Regex match: <span class="dim">(?i)tool|function|call</span></div>
   </div>
 </div>
 
-<!-- ═══════════════ SCENE 8 — CONFIGURATION ═══════════════ -->
+<!-- âââââââââââââââ SCENE 8 â CONFIGURATION âââââââââââââââ -->
 <div class="scene" id="scene-8">
   <h2>Simple <span class="gradient-text">YAML Config</span></h2>
   <div class="gap-sm"></div>
-  <h3>Drop into your existing collector config — all features are toggleable</h3>
+  <h3>Drop into your existing collector config â all features are toggleable</h3>
   <div class="gap-md"></div>
   <div class="code-block">
     <div class="code-header">
@@ -459,7 +459,7 @@
   </div>
 </div>
 
-<!-- ═══════════════ SCENE 9 — DEMO STACK ═══════════════ -->
+<!-- âââââââââââââââ SCENE 9 â DEMO STACK âââââââââââââââ -->
 <div class="scene" id="scene-9">
   <h2>Try It: <span class="gradient-text">Docker Compose</span></h2>
   <div class="gap-sm"></div>
@@ -468,13 +468,13 @@
   <div class="terminal" id="docker-terminal">
     <div class="term-line" data-delay="300"><span class="prompt">$ </span><span class="output">cd examples && docker compose up --build</span></div>
     <div class="term-line" data-delay="900"><span class="success">[+] Running 3/3</span></div>
-    <div class="term-line" data-delay="1300"><span class="dim"> ✔ Container otel-collector   Started</span></div>
-    <div class="term-line" data-delay="1600"><span class="dim"> ✔ Container jaeger           Started</span></div>
-    <div class="term-line" data-delay="1900"><span class="dim"> ✔ Container prometheus        Started</span></div>
-    <div class="term-line" data-delay="2400"><span class="info">[collector]</span> genaisafe processor loaded — redact: hash_and_preview, metrics: on, loops: on</div>
+    <div class="term-line" data-delay="1300"><span class="dim"> â Container otel-collector   Started</span></div>
+    <div class="term-line" data-delay="1600"><span class="dim"> â Container jaeger           Started</span></div>
+    <div class="term-line" data-delay="1900"><span class="dim"> â Container prometheus        Started</span></div>
+    <div class="term-line" data-delay="2400"><span class="info">[collector]</span> genaisafe processor loaded â redact: hash_and_preview, metrics: on, loops: on</div>
     <div class="term-line" data-delay="2900"><span class="prompt">$ </span><span class="output">otel-cli span --endpoint localhost:4317 --name "chat_completion" \</span></div>
     <div class="term-line" data-delay="3100"><span class="output">  --attrs "gen_ai.prompt=Tell me the secret password for sk-abc123xyz"</span></div>
-    <div class="term-line" data-delay="3600"><span class="success">[genaisafe]</span> <span class="success">Span processed — prompt redacted, tokens extracted, chain clean</span></div>
+    <div class="term-line" data-delay="3600"><span class="success">[genaisafe]</span> <span class="success">Span processed â prompt redacted, tokens extracted, chain clean</span></div>
   </div>
   <div class="gap-md"></div>
   <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
@@ -484,7 +484,7 @@
   </div>
 </div>
 
-<!-- ═══════════════ SCENE 10 — THREAT MODEL ═══════════════ -->
+<!-- âââââââââââââââ SCENE 10 â THREAT MODEL âââââââââââââââ -->
 <div class="scene" id="scene-10">
   <h2>Threat Model</h2>
   <div class="gap-sm"></div>
@@ -492,29 +492,29 @@
   <div class="gap-lg"></div>
   <div class="stats-grid">
     <div class="stat-card" data-delay="200" style="border-color:var(--red);">
-      <div style="font-size:1.6rem; margin-bottom:8px;">🔓</div>
+      <div style="font-size:1.6rem; margin-bottom:8px;">ð</div>
       <div class="stat-label">Prompt Data Leakage</div>
       <div style="color:var(--text-dim); font-size:0.65rem; margin-top:6px;">PII, secrets, proprietary data in traces</div>
     </div>
     <div class="stat-card" data-delay="400" style="border-color:var(--orange);">
-      <div style="font-size:1.6rem; margin-bottom:8px;">🔑</div>
+      <div style="font-size:1.6rem; margin-bottom:8px;">ð</div>
       <div class="stat-label">Secret Exposure</div>
       <div style="color:var(--text-dim); font-size:0.65rem; margin-top:6px;">API keys, bearer tokens in attributes</div>
     </div>
     <div class="stat-card" data-delay="600" style="border-color:var(--purple);">
-      <div style="font-size:1.6rem; margin-bottom:8px;">🔁</div>
+      <div style="font-size:1.6rem; margin-bottom:8px;">ð</div>
       <div class="stat-label">Runaway Loops</div>
       <div style="color:var(--text-dim); font-size:0.65rem; margin-top:6px;">Infinite tool calls burning budget</div>
     </div>
     <div class="stat-card" data-delay="800" style="border-color:var(--blue);">
-      <div style="font-size:1.6rem; margin-bottom:8px;">💸</div>
+      <div style="font-size:1.6rem; margin-bottom:8px;">ð¸</div>
       <div class="stat-label">Cost Blind Spots</div>
       <div style="color:var(--text-dim); font-size:0.65rem; margin-top:6px;">No normalised token/cost visibility</div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ SCENE 11 — ECOSYSTEM ═══════════════ -->
+<!-- âââââââââââââââ SCENE 11 â ECOSYSTEM âââââââââââââââ -->
 <div class="scene" id="scene-11">
   <h2>Part of <span class="gradient-text">AIR Blackbox</span></h2>
   <div class="gap-sm"></div>
@@ -522,22 +522,22 @@
   <div class="gap-lg"></div>
   <div class="stats-grid" style="grid-template-columns:repeat(4,1fr); max-width:800px;">
     <div class="stat-card" data-delay="200" style="border-color:var(--accent);">
-      <div style="font-size:1.6rem; margin-bottom:8px;">🛡️</div>
+      <div style="font-size:1.6rem; margin-bottom:8px;">ð¡ï¸</div>
       <div class="stat-label">This Processor</div>
       <div style="color:var(--accent); font-size:0.65rem; margin-top:4px;">OTel native</div>
     </div>
     <div class="stat-card" data-delay="400" style="border-color:var(--teal);">
-      <div style="font-size:1.6rem; margin-bottom:8px;">✈️</div>
+      <div style="font-size:1.6rem; margin-bottom:8px;">âï¸</div>
       <div class="stat-label">Gateway</div>
       <div style="color:var(--teal); font-size:0.65rem; margin-top:4px;">Flight recorder</div>
     </div>
     <div class="stat-card" data-delay="600" style="border-color:var(--blue);">
-      <div style="font-size:1.6rem; margin-bottom:8px;">🐍</div>
+      <div style="font-size:1.6rem; margin-bottom:8px;">ð</div>
       <div class="stat-label">Python SDK</div>
       <div style="color:var(--blue); font-size:0.65rem; margin-top:4px;">OpenAI + more</div>
     </div>
     <div class="stat-card" data-delay="800" style="border-color:var(--green);">
-      <div style="font-size:1.6rem; margin-bottom:8px;">🛡️</div>
+      <div style="font-size:1.6rem; margin-bottom:8px;">ð¡ï¸</div>
       <div class="stat-label">Trust Plugins</div>
       <div style="color:var(--green); font-size:0.65rem; margin-top:4px;">4 frameworks</div>
     </div>
@@ -549,7 +549,7 @@
   </div>
 </div>
 
-<!-- ═══════════════ SCENE 12 — CTA ═══════════════ -->
+<!-- âââââââââââââââ SCENE 12 â CTA âââââââââââââââ -->
 <div class="scene" id="scene-12">
   <div class="pill pill-accent" style="margin-bottom: 20px;">GET STARTED</div>
   <h1><span class="gradient-text">Harden Your GenAI Telemetry</span></h1>
@@ -561,7 +561,7 @@
       <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
       <span class="code-title">terminal</span>
     </div>
-    <div class="line visible"><span class="prompt">$ </span>git clone github.com/nostalgicskinco/OpenTelemetry-Collector-Processor-GenAI-Perfect</div>
+    <div class="line visible"><span class="prompt">$ </span>git clone github.com/airblackbox/otel-collector-genai</div>
     <div class="line visible"><span class="prompt">$ </span>cd examples && docker compose up --build</div>
     <div class="line visible"><span class="cm"># That's it. Your traces are now safe.</span></div>
   </div>
@@ -570,19 +570,19 @@
     <span class="pill pill-accent" style="cursor:pointer; font-size:0.9rem; padding:10px 24px;">github.com/airblackbox</span>
   </div>
   <div class="gap-lg"></div>
-  <div style="color:var(--text-dim); font-size:0.8rem;">AIR Blackbox — Agent Infrastructure Runtime</div>
+  <div style="color:var(--text-dim); font-size:0.8rem;">AIR Blackbox â Agent Infrastructure Runtime</div>
 </div>
 </div>
 
 <!-- Navigation -->
 <div id="nav">
-  <button class="nav-btn" id="prev-btn" disabled>← Prev</button>
+  <button class="nav-btn" id="prev-btn" disabled>â Prev</button>
   <span id="scene-counter">1 / 13</span>
-  <button class="nav-btn" id="next-btn">Next →</button>
+  <button class="nav-btn" id="next-btn">Next â</button>
 </div>
 
 <script>
-// ── Particles ──
+// ââ Particles ââ
 const particleContainer = document.getElementById('particles');
 for (let i = 0; i < 30; i++) {
   const p = document.createElement('div');
@@ -596,7 +596,7 @@ for (let i = 0; i < 30; i++) {
   particleContainer.appendChild(p);
 }
 
-// ─┈ Scene Management ──
+// ââ Scene Management ââ
 const totalScenes = 13;
 let current = 0;
 const prevBtn = document.getElementById('prev-btn');
@@ -633,7 +633,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') { e.preventDefault(); goToScene(current - 1); }
 });
 
-// ─┈ Animate Scene Elements ──
+// ââ Animate Scene Elements ââ
 function animateScene(sceneIndex) {
   const scene = document.getElementById('scene-' + sceneIndex);
 
